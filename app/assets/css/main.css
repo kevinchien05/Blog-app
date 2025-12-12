@@ -62,3 +62,19 @@ overflow: auto; /* Enables scrolling */
 scrollbar-width: none; /* Firefox */
 -ms-overflow-style: none; /* IE and Edge */
 }
+
+.ellipsis-multiline {
+  --lines: 2;
+  display: -webkit-box;          
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lines);
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;                
+  
+  line-height: 1.5rem;                               
+  max-height: calc(var(--lines) * 1.5rem);           
+  display: block;                                   
+
+}
