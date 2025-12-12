@@ -25,7 +25,7 @@
                     </div>
                     <div class="flex flex-col gap-1">
                         <label for="passwordConfirmation" class="font-semibold">Confirm Password</label>
-                        <Password inputId="passwordConfirmation" v-model="user.password" class="w-full" toggleMask
+                        <Password inputId="passwordConfirmation" v-model="user.confirmPassword" class="w-full" toggleMask
                             :feedback="false" />
                     </div>
                 </div>
@@ -42,6 +42,7 @@
     </NuxtLayout>
 </template>
 <script setup lang="ts">
+import AuthService from '~/service/AuthService';
 import type { User } from '~/types/user';
 
 const user = ref<User>({
@@ -52,7 +53,18 @@ const user = ref<User>({
     confirmPassword: "",
 });
 
+const loading = ref<boolean>(false);
+
 const loginUser = async (): Promise<void> => {
-    console.log(user.value);
+    try {
+        loading.value = true;
+        await AuthService.registerUser(user.value).then(response => {
+            console.log(response.data);
+        })
+    } catch (error) {
+        console.log(error)
+    } finally{
+        loading.value = false;
+    }
 }
 </script>
