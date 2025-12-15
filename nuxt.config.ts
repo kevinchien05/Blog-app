@@ -29,7 +29,9 @@ export default defineNuxtConfig({
     ],
   },
   modules: [
-    '@primevue/nuxt-module'
+    '@primevue/nuxt-module',
+    '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt'
   ],
   primevue: {
     autoImport: true,

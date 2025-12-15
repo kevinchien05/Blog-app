@@ -37,7 +37,12 @@
     </div>
 </template>
 <script setup lang="ts">
+import { createAuthService } from '~/service/AuthService';
+
 const route = useRoute();
+const {$api} = useNuxtApp();
+const authService = createAuthService($api);
+const userStore = useUserStore();
 
 const isActive = (itemPage: string[]): boolean => {
     if (itemPage) {
@@ -47,7 +52,9 @@ const isActive = (itemPage: string[]): boolean => {
     }
 }
 
-const logout = (): void => {
+const logout =async (): Promise<void> => {
+    await authService.logoutUser();
+    await userStore.logout();
     navigateTo("/login");
 }
 

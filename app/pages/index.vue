@@ -51,6 +51,8 @@
 <script setup lang="ts">
 import type { page, sort } from '~/types/page';
 
+const userStore = useUserStore();
+
 const sorting = ref<sort>({
     label: "Asc",
     icon: "pi pi-sort"
