@@ -1,18 +1,12 @@
-import axios from "axios";
+import type { AxiosInstance } from "axios";
 
-const config = useRuntimeConfig();
-
-const URL_BASE = `${config.public.springUrl}/auth`;
-
-class AuthService {
-
+export const createAuthService = (api: AxiosInstance) => ({
     registerUser(dto: object) {
-        return axios.post(`${URL_BASE}/register`, dto);
+        return api.post('/auth/register', dto)
+    },
+
+    verifyEmail(token: string) {
+        return api.get(`/auth/verify-email?token=${token}`)
     }
 
-    verifyEmail(token: string){
-        return axios.get(`${URL_BASE}/verify-email?token=${token}`);
-    }
-
-}
-export default new AuthService();
+})

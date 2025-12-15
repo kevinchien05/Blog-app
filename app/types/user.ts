@@ -5,4 +5,5 @@ export interface User {
     confirmPassword? : string;
     oldPassword? : string;
     rememberMe?: Boolean;
+    terms? : Boolean;
 }

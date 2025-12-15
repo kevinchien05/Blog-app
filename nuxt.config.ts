@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      springUrl: ''
+      springUrl: process.env.NUXT_PUBLIC_SPRING_URL
     }
   },
   compatibilityDate: '2025-07-15',
