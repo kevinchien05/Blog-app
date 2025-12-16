@@ -4,7 +4,8 @@ import { createAuthService } from "~/service/AuthService";
 export const useUserStore = defineStore('user', {
     state: () => ({
         data: null,
-        authenticated: false
+        authenticated: false,
+        loaded: false
     }),
     actions: {
         async fetchUser() {
@@ -17,7 +18,11 @@ export const useUserStore = defineStore('user', {
                     this.authenticated = true;
                 }
             } catch (e) {
+                this.data = null;
+                this.authenticated = false;
                 console.error("Fetch user failed", e);
+            } finally {
+                this.loaded = true;
             }
         },
         logout() {

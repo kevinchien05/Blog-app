@@ -1,7 +1,9 @@
 <template>
     <div class="min-h-screen flex flex-col sm:flex-row">
-        <Sidebar />
-        <MobileNavBar />
+        <ClientOnly>
+            <Sidebar />
+            <MobileNavBar />
+        </ClientOnly>
         <slot></slot>
     </div>
 </template>

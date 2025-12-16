@@ -1,6 +1,6 @@
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware(async (to) => {
     const userStore = useUserStore();
-
+    await userStore.fetchUser();
     const publicRoute = ['/login', '/register','/verify-email','/forget','/change/password']
 
     if(!userStore.authenticated){
