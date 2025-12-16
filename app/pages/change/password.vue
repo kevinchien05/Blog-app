@@ -27,7 +27,8 @@
                     </div>
                 </div>
                 <div class="flex mt-6 gap-2">
-                    <Button label="Cancel" variant="outlined" severity="danger" type="button" class="w-full" @click="goBack"/>
+                    <Button label="Cancel" variant="outlined" severity="danger" type="button" class="w-full"
+                        @click="goBack" />
                     <Button label="Submit" type="submit" class="w-full" />
                 </div>
             </form>
@@ -36,8 +37,15 @@
 </template>
 <script setup lang="ts">
 import type { User } from '~/types/user';
+import Utf8 from 'crypto-js/enc-utf8';
+import AES from 'crypto-js/AES';
+import { createAuthService } from '~/service/AuthService';
 
+const config = useRuntimeConfig();
+const secretKey = config.public.secretKey;
 const route = useRoute();
+const { $api } = useNuxtApp();
+const authService = createAuthService($api);
 
 const user = ref<User>({
     username: "",
@@ -51,7 +59,10 @@ const goBack = (): void => {
     navigateTo({ name: 'login' });
 }
 
-const submitChange = (): void => {
-    console.log(user.value);
+const submitChange = async (): Promise<void> => {
+    const bytes = AES.decrypt(route.query.email as string, secretKey);
+    const decryptText = bytes.toString(Utf8);
+    console.log(decryptText);
+    await authService.changePass(decryptText,user.value.password);
 }
 </script>

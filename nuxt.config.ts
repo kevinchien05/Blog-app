@@ -17,7 +17,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      springUrl: process.env.NUXT_PUBLIC_SPRING_URL
+      springUrl: process.env.NUXT_PUBLIC_SPRING_URL,
+      secretKey: process.env.NUXT_PUBLIC_SECRET_KEY
     }
   },
   compatibilityDate: '2025-07-15',

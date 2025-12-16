@@ -17,6 +17,18 @@ export const createAuthService = (api: AxiosInstance) => ({
         return api.get('/auth/user', { withCredentials: true })
     },
 
+    getEmail(email: string) {
+        return api.get(`/auth/email?email=${email}`)
+    },
+
+    resetToken(email: string, token: string) {
+        return api.get(`/auth/email/verification?email=${email}&token=${token}`);
+    },
+
+    changePass(email: string, password: string) {
+        return api.put(`/auth/change/pass?email=${email}&password=${password}`);
+    },
+
     logoutUser() {
         return api.get('/auth/logout', { withCredentials: true });
     }
