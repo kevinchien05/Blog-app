@@ -13,17 +13,27 @@
                     <div class="flex flex-col gap-1">
                         <label for="oldPassword" class="font-semibold">Old Password</label>
                         <Password inputId="oldPassword" v-model="user.oldPassword" class="w-full" toggleMask
-                            :feedback="false" />
+                            :feedback="false" :invalid="submitted && !user.oldPassword" />
+                        <span v-if="submitted && !user.oldPassword" class="text-xs text-red-600">Old Password is
+                            Empty!</span>
                     </div>
                     <div class="flex flex-col gap-1">
                         <label for="newPassword" class="font-semibold">New Password</label>
                         <Password inputId="newPassword" v-model="user.password" class="w-full" toggleMask
-                            :feedback="false" />
+                            :feedback="false" @input="formatCheck('password')"
+                            :invalid="submitted && !user.password || submitted && user.password && format.status" />
+                        <span v-if="submitted && !user.password" class="text-xs text-red-600">Password is Empty!</span>
+                        <span v-if="submitted && user.password && format.status" class="text-xs text-red-600">{{
+                            format.msg }}</span>
                     </div>
                     <div class="flex flex-col gap-1">
                         <label for="confirmPassword" class="font-semibold">Confirm Password</label>
                         <Password inputId="confirmPassword" v-model="user.confirmPassword" class="w-full" toggleMask
-                            :feedback="false" />
+                            :feedback="false"
+                            :invalid="submitted && !user.confirmPassword || submitted && mismatch.status" />
+                        <span v-if="submitted && !user.confirmPassword" class="text-xs text-red-600">Confirm Password is
+                            Empty!</span>
+                        <span v-if="submitted && mismatch.status" class="text-xs text-red-600">{{ mismatch.msg }}</span>
                     </div>
                 </div>
                 <div class="flex mt-6 gap-2">
@@ -46,6 +56,8 @@ const secretKey = config.public.secretKey;
 const route = useRoute();
 const { $api } = useNuxtApp();
 const authService = createAuthService($api);
+const loading = ref<boolean>(false);
+const submitted = ref<boolean>(false);
 
 const user = ref<User>({
     username: "",
@@ -55,14 +67,55 @@ const user = ref<User>({
     confirmPassword: ""
 });
 
+const format = ref({
+    status: false,
+    msg: ""
+});
+
+const mismatch = ref({
+    status: false,
+    msg: ""
+});
+
+const passRegex = /^(?=.*[A-Za-z])(?=.*\d)[a-zA-Z0-9!@#$%^&*()~¥=_+}{":;'?/>.<,`\-\|\[\]]{6,50}$/;
+
+function formatCheck(param: string) {
+    if (param == "password") {
+        if (!passRegex.test(user.value.password)) {
+            format.value.status = true;
+            format.value.msg = "Password must be atleast 6 characters, one capital word, one numeric character"
+        } else {
+            format.value.status = false;
+        }
+    }
+}
+
 const goBack = (): void => {
     navigateTo({ name: 'login' });
 }
 
 const submitChange = async (): Promise<void> => {
-    const bytes = AES.decrypt(route.query.email as string, secretKey);
-    const decryptText = bytes.toString(Utf8);
-    console.log(decryptText);
-    await authService.changePass(decryptText,user.value.password);
+    submitted.value = true;
+    if (user.value.oldPassword != "" && user.value.password != "" && user.value.confirmPassword != "" && !format.value.status) {
+        if (user.value.password === user.value.confirmPassword) {
+            mismatch.value.status = false;
+            try {
+                loading.value = true;
+                const bytes = AES.decrypt(route.query.email as string, secretKey);
+                const decryptText = bytes.toString(Utf8);
+                console.log(decryptText);
+                await authService.changePass(decryptText, user.value.password).then(() => {
+                    navigateTo('/login');
+                });
+            } catch (error: any) {
+                console.log(error);
+            } finally {
+                loading.value = false;
+            }
+        } else {
+            mismatch.value.status = true;
+            mismatch.value.msg = "Password is not same!";
+        }
+    }
 }
 </script>
