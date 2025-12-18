@@ -70,7 +70,7 @@
                                 <Skeleton height="1.5rem" />
                             </template>
                             <template #body="slotProps">
-                                {{ showDate(new Date(slotProps.data.postDate)) }}
+                                <NuxtTime :datetime="slotProps.data.postDate" locale="id-ID"/>
                             </template>
                         </Column>
                         <Column field="action" header="Action" style="width: 15%;">

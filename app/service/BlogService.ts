@@ -16,6 +16,10 @@ export const createBlogService = (api: AxiosInstance) => ({
 
     deleteBlog(id: number) {
         return api.delete(`/blog/delete/${id}`, { withCredentials: true });
+    },
+
+    getDetailBlog(id: number) {
+        return api.get(`/blog/detail?id=${id}`, { withCredentials: true });
     }
 
 })
