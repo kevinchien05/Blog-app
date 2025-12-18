@@ -18,13 +18,17 @@
                     <hr class="w-full">
                     <div class="h-[88dvh] overflow-y-auto scroll-hidden">
                         <div class="flex flex-wrap gap-3">
-                            <ItemCard v-for="(i, index) in 3" class="sm:basis-[98%] md:basis-[48%] xl:basis-[32%] rounded-lg"
+                            <ItemCard v-for="(i, index) in blogList?.content"
+                                class="sm:basis-[98%] md:basis-[48%] xl:basis-[32%] rounded-lg"
                                 @click="changePage(index)">
                                 <template #header>
                                     <span class="font-semibold text-xl">Tes Blog</span>
                                 </template>
                                 <template #body>
-                                    <span class="text-sm line-clamp-5">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi ipsa quo libero possimus? Qui nemo ducimus nisi reprehenderit tenetur adipisci autem commodi quae voluptatibus, vel quisquam modi ipsa, quia sapiente!</span>
+                                    <span class="text-sm line-clamp-5">Lorem ipsum dolor sit, amet consectetur
+                                        adipisicing elit. Excepturi ipsa quo libero possimus? Qui nemo ducimus nisi
+                                        reprehenderit tenetur adipisci autem commodi quae voluptatibus, vel quisquam
+                                        modi ipsa, quia sapiente!</span>
                                 </template>
                                 <template #footer>
                                     <span>09 Desember 2025</span>
@@ -49,7 +53,19 @@
     </NuxtLayout>
 </template>
 <script setup lang="ts">
+import { createBlogService } from '~/service/BlogService';
 import type { page, sort } from '~/types/page';
+
+onMounted(async () => {
+    try {
+        loading.value = true;
+        await getBlog(page.value, size.value);
+    } catch (error) {
+        console.log(error);
+    } finally {
+        loading.value = false;
+    }
+})
 
 const userStore = useUserStore();
 
@@ -58,7 +74,14 @@ const sorting = ref<sort>({
     icon: "pi pi-sort"
 });
 
+const loading = ref<boolean>(false);
 const size = ref<number>(5);
+const page = ref<number>(0);
+
+const { $api } = useNuxtApp();
+const blogService = createBlogService($api);
+
+const blogList = ref<any>();
 
 const itemPage = ref<page[]>([
     {
@@ -87,5 +110,11 @@ const sortData = (): void => {
 
 const changePage = (index: number): void => {
     navigateTo({ name: 'blog', query: { id: index } });
+}
+
+const getBlog = async (page: number, size: number): Promise<void> => {
+    await blogService.getBlogList(page, size).then((response: any) => {
+        blogList.value = response.data;
+    });
 }
 </script>
