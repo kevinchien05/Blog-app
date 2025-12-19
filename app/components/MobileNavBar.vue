@@ -18,7 +18,7 @@
         <div v-for="(group, index) in filteredItems" :key="index">
             <div v-for="item in group.items" :key="item.label" class="mb-1">
                 <div v-if="!item.command">
-                    <NuxtLink :to="{ name: item.page }"
+                    <NuxtLink :to="{ name: item.page }" v-if="item.status == 'PUBLIC' || item.status == userStore.data?.role"
                         class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                         :class="{ 'border-1 border-solid text-black dark:border-blue-900 dark:text-white': isActive(item.active) }">
                         <i :class="item.icon"></i>
@@ -62,9 +62,9 @@ const items = ref([
     { separator: true },
     {
         items: [
-            { label: 'Home', icon: 'pi pi-home', page: 'index', active: ['index', 'blog'] },
-            { label: 'Dashboard', icon: 'pi pi-th-large', page: 'admin', active: ['admin'] },
-            { label: 'Logout', icon: 'pi pi-sign-out', command: logout }
+            { label: 'Home', icon: 'pi pi-home', page: 'index', active: ['index', 'blog'], status: "PUBLIC" },
+            { label: 'Dashboard', icon: 'pi pi-th-large', page: 'admin', active: ['admin'], status: "ADMIN" },
+            { label: 'Logout', icon: 'pi pi-sign-out', command: logout, status: "PUBLIC" }
         ]
     }
 ]);

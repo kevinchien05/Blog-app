@@ -1,8 +1,13 @@
 import { defineStore } from "pinia";
 import { createAuthService } from "~/service/AuthService";
+import type { User } from "~/types/user";
 
 export const useUserStore = defineStore('user', {
-    state: () => ({
+    state: ():{
+        data: User | null,
+        authenticated: boolean,
+        loaded: boolean
+    } => ({
         data: null,
         authenticated: false,
         loaded: false

@@ -6,4 +6,10 @@ export interface User {
     oldPassword? : string;
     rememberMe?: Boolean;
     terms? : Boolean;
+    role? : string;
+    id? : number;
+    provider? : string | null;
+    providerId? : string | null;
+    verificationToken? : string;
+    verified?: boolean;
 }

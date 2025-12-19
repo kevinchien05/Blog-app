@@ -95,6 +95,7 @@ const user = ref<User>({
     password: "",
     terms: false,
     confirmPassword: "",
+    role: "USER"
 });
 
 const loading = ref<boolean>(false);

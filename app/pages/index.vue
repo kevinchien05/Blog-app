@@ -19,7 +19,7 @@
                     <div class="h-[88dvh] overflow-y-auto scroll-hidden">
                         <div class="flex flex-wrap gap-3">
                             <ItemCard v-for="(blog, index) in searchProject"
-                                class="sm:basis-[98%] md:basis-[48%] xl:basis-[32%] rounded-lg"
+                                class="sm:basis-[98%] md:basis-[48%] xl:basis-[32%] rounded-lg w-full"
                                 @click="changePage(blog.id)">
                                 <template #header>
                                     <span class="font-semibold text-xl">{{ blog.name }}</span>

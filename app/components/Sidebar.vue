@@ -10,7 +10,7 @@
             </template>
             <template #item="{ item, props }">
                 <div>
-                    <NuxtLink :to="{ name: item.page }"
+                    <NuxtLink :to="{ name: item.page }" v-if="item.status == String(userStore.data?.role) || item.status == 'PUBLIC'"
                         class="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
                         :class="{ 'border-1 border-solid text-black dark:border-blue-900 dark:text-white': isActive(item.active) }"
                         v-bind="props.action">
@@ -30,7 +30,6 @@ const userStore = useUserStore();
 const {$api} = useNuxtApp();
 const authService = createAuthService($api);
 
-
 const isActive = (itemPage: string[]): boolean => {
     if (itemPage) {
         return itemPage.includes(String(route.name));
@@ -39,7 +38,7 @@ const isActive = (itemPage: string[]): boolean => {
     }
 }
 
-const logout = async (): Promise<void> => {
+const logout: any = async (): Promise<void> => {
     await authService.logoutUser();
     await userStore.logout();
     navigateTo("/login");
@@ -49,9 +48,9 @@ const items = ref([
     { separator: true },
     {
         items: [
-            { label: 'Home', icon: 'pi pi-home', page: 'index', active: ['index', 'blog'] },
-            { label: 'Dashboard', icon: 'pi pi-th-large', page: 'admin', active: ['admin'], status: 'admin' },
-            { label: 'Logout', icon: 'pi pi-sign-out', command: logout }
+            { label: 'Home', icon: 'pi pi-home', page: 'index', active: ['index', 'blog'], status: "PUBLIC"},
+            { label: 'Dashboard', icon: 'pi pi-th-large', page: 'admin', active: ['admin'], status: "ADMIN" },
+            { label: 'Logout', icon: 'pi pi-sign-out', command: logout, status: "PUBLIC" }
         ]
     }
 ]);
