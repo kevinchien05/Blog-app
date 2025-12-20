@@ -1,130 +1,129 @@
 <template>
-    <NuxtLayout name="home">
-        <BodyContent class="flex-1 overflow-y-auto" justify="between">
-            <template #header>
-                <span class="font-bold text-xl">Admin Dashboard</span>
-            </template>
-            <template #body>
-                <div class="card">
-                    <DataTable class="flex-1" :resizableColumns="true" columnResizeMode="fit" v-model:filters="filters"
-                        :value="blogList.content" show-gridlines tableStyle="min-width: 900px; table-layout: fixed;"
-                        scrollable scrollHeight="flex" removableSort>
-                        <template #header>
-                            <div class="flex justify-between items-center">
-                                <Button label="Add" icon="pi pi-plus" severity="contrast" @click="openDialog()" />
-                                <IconField>
-                                    <InputIcon>
-                                        <i class="pi pi-search" />
-                                    </InputIcon>
-                                    <InputText v-model="filters['global'].value" placeholder="Search..." />
-                                </IconField>
+    <BodyContent class="flex-1 overflow-y-auto" justify="between">
+        <template #header>
+            <span class="font-bold text-xl">Admin Dashboard</span>
+        </template>
+        <template #body>
+            <div class="card">
+                <DataTable class="flex-1" :resizableColumns="true" columnResizeMode="fit" v-model:filters="filters"
+                    :value="blogList.content" show-gridlines tableStyle="min-width: 900px; table-layout: fixed;"
+                    scrollable scrollHeight="flex" removableSort>
+                    <template #header>
+                        <div class="flex justify-between items-center">
+                            <Button label="Add" icon="pi pi-plus" severity="contrast" @click="openDialog()" />
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
+                                <InputText v-model="filters['global'].value" placeholder="Search..." />
+                            </IconField>
+                        </div>
+                    </template>
+                    <template #empty>
+                        <div class="flex justify-center"><span class="font-bold">No Blog found.</span></div>
+                    </template>
+                    <template #footer>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1">
+                                <span class="text-xs">Items per page</span>
+                                <Select size="small" :options="itemPage" optionValue="value" optionLabel="name"
+                                    v-model="size" @change="changeSize" />
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <Button icon="pi pi-angle-left" size="small" variant="text" severity="contrast"
+                                    :disabled="page == 0" @click="changePage('prev')" />
+                                <Button icon="pi pi-angle-right" size="small" variant="text" severity="contrast"
+                                    :disabled="page + 1 == blogList.totalPages || blogList.totalPages == 0"
+                                    @click="changePage('next')" />
+                            </div>
+                        </div>
+                    </template>
+                    <Column field="id" header="No." sortable style="width: 10%">
+                        <template #body v-if="loading">
+                            <Skeleton height="1.5rem" />
+                        </template>
+                        <template #body="slotProps">
+                            {{ slotProps.index + 1 + "." }}
+                        </template>
+                    </Column>
+                    <Column field="name" header="Name" sortable style="width: 15%;">
+                        <template #body v-if="loading">
+                            <Skeleton height="1.5rem" />
+                        </template>
+                        <template #body="slotProps">
+                            <span class="ellipsis-multiline">{{ capitalize(slotProps.data.name) }}</span>
+                        </template>
+                    </Column>
+                    <Column field="description" header="Description" style="min-width: 200px;">
+                        <template #body v-if="loading">
+                            <Skeleton height="1.5rem" />
+                        </template>
+                        <template #body="slotProps">
+                            <span class="ellipsis-multiline">
+                                {{ slotProps.data.description ? slotProps.data.description : "-" }}
+                            </span>
+                        </template>
+                    </Column>
+                    <Column field="postDate" header="Post Date" sortable style="width: 15%;">
+                        <template #body v-if="loading">
+                            <Skeleton height="1.5rem" />
+                        </template>
+                        <template #body="slotProps">
+                            <NuxtTime :datetime="slotProps.data.postDate" locale="id-ID" />
+                        </template>
+                    </Column>
+                    <Column field="action" header="Action" style="width: 15%;">
+                        <template #body v-if="loading">
+                            <Skeleton height="1.5rem" />
+                        </template>
+                        <template #body="slotProps">
+                            <div class="flex items-center gap-1">
+                                <Button icon="pi pi-pencil" severity="contrast"
+                                    @click="openDialog('edit', slotProps.data.id)" />
+                                <Button icon="pi pi-trash" severity="danger"
+                                    @click="confirmDelete(() => deleteBlog(slotProps.data.id, slotProps.index))" />
                             </div>
                         </template>
-                        <template #empty>
-                            <div class="flex justify-center"><span class="font-bold">No Blog found.</span></div>
-                        </template>
-                        <template #footer>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-1">
-                                    <span class="text-xs">Items per page</span>
-                                    <Select size="small" :options="itemPage" optionValue="value" optionLabel="name"
-                                        v-model="size" @change="changeSize" />
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <Button icon="pi pi-angle-left" size="small" variant="text" severity="contrast"
-                                        :disabled="page == 0" @click="changePage('prev')" />
-                                    <Button icon="pi pi-angle-right" size="small" variant="text" severity="contrast"
-                                        :disabled="page + 1 == blogList.totalPages || blogList.totalPages == 0"
-                                        @click="changePage('next')" />
-                                </div>
-                            </div>
-                        </template>
-                        <Column field="id" header="No." sortable style="width: 10%">
-                            <template #body v-if="loading">
-                                <Skeleton height="1.5rem" />
-                            </template>
-                            <template #body="slotProps">
-                                {{ slotProps.index + 1 + "." }}
-                            </template>
-                        </Column>
-                        <Column field="name" header="Name" sortable style="width: 15%;">
-                            <template #body v-if="loading">
-                                <Skeleton height="1.5rem" />
-                            </template>
-                            <template #body="slotProps">
-                                <span class="ellipsis-multiline">{{ capitalize(slotProps.data.name) }}</span>
-                            </template>
-                        </Column>
-                        <Column field="description" header="Description" style="min-width: 200px;">
-                            <template #body v-if="loading">
-                                <Skeleton height="1.5rem" />
-                            </template>
-                            <template #body="slotProps">
-                                <span class="ellipsis-multiline">
-                                    {{ slotProps.data.description ? slotProps.data.description : "-" }}
-                                </span>
-                            </template>
-                        </Column>
-                        <Column field="postDate" header="Post Date" sortable style="width: 15%;">
-                            <template #body v-if="loading">
-                                <Skeleton height="1.5rem" />
-                            </template>
-                            <template #body="slotProps">
-                                <NuxtTime :datetime="slotProps.data.postDate" locale="id-ID"/>
-                            </template>
-                        </Column>
-                        <Column field="action" header="Action" style="width: 15%;">
-                            <template #body v-if="loading">
-                                <Skeleton height="1.5rem" />
-                            </template>
-                            <template #body="slotProps">
-                                <div class="flex items-center gap-1">
-                                    <Button icon="pi pi-pencil" severity="contrast"
-                                        @click="openDialog('edit', slotProps.data.id)" />
-                                    <Button icon="pi pi-trash" severity="danger"
-                                        @click="confirmDelete(() => deleteBlog(slotProps.data.id, slotProps.index))" />
-                                </div>
-                            </template>
-                        </Column>
-                    </DataTable>
-                </div>
-            </template>
-        </BodyContent>
-
-        <!-- dialog untuk tambah blog -->
-        <LazyDialog v-model:visible="showDialog" modal :style="{ width: '450px' }" class="mx-5">
-            <template #header>
-                <span class="text-lg font-bold">{{ title }}</span>
-            </template>
-            <div class="flex flex-col gap-2">
-                <div class="flex flex-col gap-1">
-                    <label for="name" class="font-semibold">Name</label>
-                    <InputText v-if="!edit" id="name" class="w-full" v-model="blog.name" />
-                    <InputText v-else id="name" class="w-full" v-model="editData.name" />
-                </div>
-                <div class="flex flex-col gap-1">
-                    <label for="description" class="font-semibold">Description</label>
-                    <Textarea v-if="!edit" inputId="description" v-model="blog.description" rows="5" />
-                    <Textarea v-else inputId="description" v-model="editData.description" rows="5" />
-                </div>
+                    </Column>
+                </DataTable>
             </div>
-            <template #footer>
-                <div class="flex items-center gap-2">
-                    <Button label="Cancel" severity="danger" @click="closeDialog" />
-                    <Button v-if="!edit" label="Submit" severity="contrast" @click="submitBlog" :disabled="taskLoading">
-                        <template v-if="taskLoading">
-                            <span><i class="pi pi-spin pi-spinner"></i></span>
-                        </template>
-                    </Button>
-                    <Button v-else label="Submit" severity="contrast" @click="editBlog(editData.id)" :disabled="taskLoading">
-                        <template v-if="taskLoading">
-                            <span><i class="pi pi-spin pi-spinner"></i></span>
-                        </template>
-                    </Button>
-                </div>
-            </template>
-        </LazyDialog>
-    </NuxtLayout>
+        </template>
+    </BodyContent>
+
+    <!-- dialog untuk tambah blog -->
+    <LazyDialog v-model:visible="showDialog" modal :style="{ width: '450px' }" class="mx-5">
+        <template #header>
+            <span class="text-lg font-bold">{{ title }}</span>
+        </template>
+        <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-1">
+                <label for="name" class="font-semibold">Name</label>
+                <InputText v-if="!edit" id="name" class="w-full" v-model="blog.name" />
+                <InputText v-else id="name" class="w-full" v-model="editData.name" />
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="description" class="font-semibold">Description</label>
+                <Textarea v-if="!edit" inputId="description" v-model="blog.description" rows="5" />
+                <Textarea v-else inputId="description" v-model="editData.description" rows="5" />
+            </div>
+        </div>
+        <template #footer>
+            <div class="flex items-center gap-2">
+                <Button label="Cancel" severity="danger" @click="closeDialog" />
+                <Button v-if="!edit" label="Submit" severity="contrast" @click="submitBlog" :disabled="taskLoading">
+                    <template v-if="taskLoading">
+                        <span><i class="pi pi-spin pi-spinner"></i></span>
+                    </template>
+                </Button>
+                <Button v-else label="Submit" severity="contrast" @click="editBlog(editData.id)"
+                    :disabled="taskLoading">
+                    <template v-if="taskLoading">
+                        <span><i class="pi pi-spin pi-spinner"></i></span>
+                    </template>
+                </Button>
+            </div>
+        </template>
+    </LazyDialog>
 </template>
 <script setup lang="ts">
 import { capitalize } from 'vue';
@@ -134,6 +133,11 @@ import { FilterMatchMode } from '@primevue/core/api';
 import type { page } from '~/types/page';
 import { confirmDelete } from '~/func/confirmDelete';
 import { createBlogService } from '~/service/BlogService';
+
+definePageMeta({
+    middleware: 'admin',
+    layout: 'home'
+})
 
 onMounted(async () => {
     try {
@@ -171,7 +175,7 @@ const openDialog = (section?: string, id?: number): void => {
     if (section == "edit") {
         edit.value = true;
         title.value = "Edit Blog";
-        editData.value = {...blogList.value.content.find((b: { id: number; }) => b.id === id)};
+        editData.value = { ...blogList.value.content.find((b: { id: number; }) => b.id === id) };
     } else {
         title.value = "Add Blog";
         edit.value = false;
@@ -249,14 +253,14 @@ const editBlog = async (id?: number): Promise<void> => {
         taskLoading.value = true;
         await blogService.editBlog(editData.value, id).then((response) => {
             const idx = blogList.value.content.findIndex((b: { id: number; }) => b.id === id);
-            if(idx > -1) blogList.value.content[idx] = response.data;
+            if (idx > -1) blogList.value.content[idx] = response.data;
             closeDialog();
         });
     } catch (error) {
         console.log(error);
     } finally {
         taskLoading.value = false;
-    }   
+    }
 }
 const size = ref<number>(5);
 const page = ref<number>(0);

@@ -1,5 +1,5 @@
 <template>
-    <NuxtLayout>
+    
         <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow-xl rounded-border w-full lg:w-6/12 mx-auto">
             <div class="flex justify-center">
                 <div class="flex flex-col items-center gap-2">
@@ -58,7 +58,6 @@
                 </div>
             </form>
         </div>
-    </NuxtLayout>
 </template>
 <script setup lang="ts">
 import { createAuthService } from '~/service/AuthService';

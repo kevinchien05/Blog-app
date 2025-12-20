@@ -10,6 +10,10 @@ const { $api } = useNuxtApp();
 const authService = createAuthService($api);
 const msg = ref<string>("");
 
+definePageMeta({
+    layout: "verify"
+})
+
 onBeforeMount(() => {
     verifyEmail();
 })
